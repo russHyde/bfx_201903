@@ -14,7 +14,8 @@ knitr::opts_chunk$set(echo = FALSE)
 ## R / Python development tools
 
 ```{r}
-library(kableExtra)
+# library(kableExtra)
+library(knitr)
 library(magrittr)
 library(tibble)
 ```
@@ -29,11 +30,12 @@ tribble(
   "Packages", "cookiecutter / setuptools", "devtools / usethis",
   "Docs", "sphinx / restructuredText", "roxygen2 / rmarkdown"
   ) %>%
-  kable() %>%
-  kable_styling("striped") %>%
-  column_spec(1, bold = T, border_right = T) %>%
-  column_spec(2, width = "15em") %>%
-  column_spec(3, width = "15em")
+  kable()
+#%>%
+#  kable_styling("striped") %>%
+#  column_spec(1, bold = T, border_right = T) %>%
+#  column_spec(2, width = "15em") %>%
+#  column_spec(3, width = "15em")
 ```
 
 <!-- Give more detail / alternatives in specific sections -->
@@ -56,16 +58,93 @@ tribble(
     - CRAN packageDev Task View
     - Dangers of `fixing` poorly-tested code
     - Performance profiling
+    - Lots of python 2 legacy code is going to be chucked off a cliff
+      - 2to3.py
 -->
 
 <!--
-[From realpython.com/python-code-quality]
-
-Pylint prefixes each of the problem areas with a R, C, W, E, or F, meaning:
-
-[R]efactor for a “good practice” metric violation
-[C]onvention for coding standard violation
-[W]arning for stylistic problems, or minor programming issues
-[E]rror for important programming issues (i.e. most probably bug)
-[F]atal for errors which prevented further processing
+    [From realpython.com/python-code-quality]
+    
+    Pylint prefixes each of the problem areas with a R, C, W, E, or F, meaning:
+    
+    [R]efactor for a “good practice” metric violation
+    [C]onvention for coding standard violation
+    [W]arning for stylistic problems, or minor programming issues
+    [E]rror for important programming issues (i.e. most probably bug)
+    [F]atal for errors which prevented further processing
 -->
+
+# pylint
+
+## `pylint` messages
+
+```{bash, echo = TRUE}
+echo ...
+pylint --long-help | tail -n20 | head -n 8
+```
+
+## `pylint` return codes
+
+```{bash, echo = TRUE}
+echo ...
+pylint --long-help | tail -n12
+```
+
+
+# Rosalind
+
+## Initial Solution for LGIS from rosalind.info
+
+[Rosalind](http://rosalind.info/about/)
+
+[Longest Increasing Subsequence](http://rosalind.info/problems/lgis/)
+
+##
+
+```{bash, echo = TRUE}
+cat rosa/initial.py
+```
+
+# Initial lints
+
+## Convention (C) and Warning (W) lints in the initial code 
+
+<!-- 
+    Have to use --exit-zero since non-zero bash blocks kill `Rmarkdown`
+    compilation
+-->
+
+```{bash, echo = FALSE}
+echo "" > rosa/cleaned.py
+pylint rosa/cleaned.py --exit-zero > /dev/null
+```
+
+```{bash, eval = TRUE, echo = TRUE}
+cp rosa/{initial,cleaned}.py
+
+pylint rosa/cleaned.py --exit-zero | tail -n 12
+```
+
+# Styling using `black`
+
+## `black` modifies files in-place
+
+```{bash, echo = TRUE}
+black rosa/cleaned.py
+```
+
+## `black` reduced the lint count
+
+```{bash, echo = TRUE}
+pylint rosa/cleaned.py --exit-zero
+```
+
+##
+
+```{bash, echo = TRUE}
+diff rosa/initial.py rosa/cleaned.py | grep -e ">\|<" | head -n6
+```
+
+```{bash, echo = TRUE}
+diff rosa/initial.py rosa/cleaned.py | grep -e ">\|<" | tail -n6
+```
