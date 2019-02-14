@@ -2,3 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
+
+# computed files
+*.html
+rosa/cleaned.py
