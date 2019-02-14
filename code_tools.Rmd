@@ -1,0 +1,71 @@
+---
+title: "There's a tool to do that"
+author: "Russ Hyde"
+date: "14 February 2019"
+output:
+  ioslides_presentation:
+    df_print: kable
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## R / Python development tools
+
+```{r}
+library(kableExtra)
+library(magrittr)
+library(tibble)
+```
+
+```{r, echo  FALSE}
+tribble(
+  ~ Job, ~ Python, ~ R,
+  "IDE",  "PyCharm",  "Rstudio",
+  "Styling", "black", "styler",
+  "Linting", "pylint", "lintr",
+  "Testing", "pytest", "testthat",
+  "Packages", "cookiecutter / setuptools", "devtools / usethis",
+  "Docs", "sphinx / restructuredText", "roxygen2 / rmarkdown"
+  ) %>%
+  kable() %>%
+  kable_styling("striped") %>%
+  column_spec(1, bold = T, border_right = T) %>%
+  column_spec(2, width = "15em") %>%
+  column_spec(3, width = "15em")
+```
+
+<!-- Give more detail / alternatives in specific sections -->
+<!-- Other jobs:
+    "Testing (Advanced)": "hypothesis / raygun", "hedgehog"
+    "CI": Travis
+    "Release": CRAN / Anaconda / pip / pypi
+    "VCS": git / github
+-->
+
+<!-- Mention:
+    - Style guides for code and internal consistency
+    - Automatic documentation generation
+    - Code review  / Stack overflow
+    - Beyond code-style:
+        - goodpractice
+        - dupree / pylint's duplicate finder
+        - mypy & typing
+    - Awesome static analysis
+    - CRAN packageDev Task View
+    - Dangers of `fixing` poorly-tested code
+    - Performance profiling
+-->
+
+<!--
+[From realpython.com/python-code-quality]
+
+Pylint prefixes each of the problem areas with a R, C, W, E, or F, meaning:
+
+[R]efactor for a “good practice” metric violation
+[C]onvention for coding standard violation
+[W]arning for stylistic problems, or minor programming issues
+[E]rror for important programming issues (i.e. most probably bug)
+[F]atal for errors which prevented further processing
+-->
