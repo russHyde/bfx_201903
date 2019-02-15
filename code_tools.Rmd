@@ -9,6 +9,27 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
+
+```
+
+<!-- Formatting code
+     ---------------
+     Thanks to Yihui for text-display code:
+    - https://stackoverflow.com/questions/29257985/r-markdown-how-do-i-show-file-contents
+
+    Thanks to @hrbrmstr for the scrolling text-box styling:
+    - https://stackoverflow.com/questions/38578152/make-scrollbar-appear-in-rmarkdown-code-chunks-html-view
+-->
+
+```{css}
+pre code, pre, code {
+  max-height: 550px;
+  white-space: pre !important;
+  overflow-x: scroll !important;
+  overflow-y: scroll !important;
+  word-break: keep-all !important;
+  word-wrap: initial !important;
+}
 ```
 
 ## R / Python development tools
@@ -31,11 +52,6 @@ tribble(
   "Docs", "sphinx / restructuredText", "roxygen2 / rmarkdown"
   ) %>%
   kable()
-#%>%
-#  kable_styling("striped") %>%
-#  column_spec(1, bold = T, border_right = T) %>%
-#  column_spec(2, width = "15em") %>%
-#  column_spec(3, width = "15em")
 ```
 
 <!-- Give more detail / alternatives in specific sections -->
@@ -62,21 +78,37 @@ tribble(
       - 2to3.py
 -->
 
+
+
+# Rosalind
+
+## Initial Solution for `Longest Increasing Subsequence` from rosalind.info
+
+[Rosalind](http://rosalind.info/about/)
+
+[Longest Increasing Subsequence](http://rosalind.info/problems/lgis/)
+
+##
+
+```{bash, comment = ''}
+cat rosa/initial.py
+```
+
+# Automate reviewing code-quality / consistency: `pylint`
+
+## `pylint` messages
+
 <!--
     [From realpython.com/python-code-quality]
-    
+
     Pylint prefixes each of the problem areas with a R, C, W, E, or F, meaning:
-    
+
     [R]efactor for a “good practice” metric violation
     [C]onvention for coding standard violation
     [W]arning for stylistic problems, or minor programming issues
     [E]rror for important programming issues (i.e. most probably bug)
     [F]atal for errors which prevented further processing
 -->
-
-# pylint
-
-## `pylint` messages
 
 ```{bash, echo = TRUE}
 echo ...
@@ -90,26 +122,9 @@ echo ...
 pylint --long-help | tail -n12
 ```
 
+## Convention (C) and Warning (W) lints in the initial code
 
-# Rosalind
-
-## Initial Solution for LGIS from rosalind.info
-
-[Rosalind](http://rosalind.info/about/)
-
-[Longest Increasing Subsequence](http://rosalind.info/problems/lgis/)
-
-##
-
-```{bash, echo = TRUE}
-cat rosa/initial.py
-```
-
-# Initial lints
-
-## Convention (C) and Warning (W) lints in the initial code 
-
-<!-- 
+<!--
     Have to use --exit-zero since non-zero bash blocks kill `Rmarkdown`
     compilation
 -->
@@ -122,15 +137,27 @@ pylint rosa/cleaned.py --exit-zero > /dev/null
 ```{bash, eval = TRUE, echo = TRUE}
 cp rosa/{initial,cleaned}.py
 
-pylint rosa/cleaned.py --exit-zero | tail -n 12
+pylint rosa/cleaned.py --exit-zero
 ```
 
-# Styling using `black`
+# Automate Styling : `black`
 
 ## `black` modifies files in-place
 
 ```{bash, echo = TRUE}
 black rosa/cleaned.py
+```
+
+## Example `black` differences
+
+```{bash, echo = TRUE}
+diff rosa/initial.py rosa/cleaned.py | grep -e ">\|<" | head -n6
+```
+
+## The styled code
+
+```{bash, comment = ''}
+cat rosa/cleaned.py
 ```
 
 ## `black` reduced the lint count
@@ -139,12 +166,243 @@ black rosa/cleaned.py
 pylint rosa/cleaned.py --exit-zero
 ```
 
-##
+## Manually fixed the remaining lints:
+
+Changes:
+
+- Added module / function description strings
+
+- Varnames:
+    - Global constant vars $\rightarrow$ upper-case
+    - Short varnames fixed `lt` $\rightarrow$ `parents`
+
+- Removed an unused argument
+
+- Changed empty-list tests:
+    - `if len(my_list) > 0: ...` $\rightarrow$ `if my_list: ...`
+
+## Styled & Lint-free code:
+
+```{bash, comment = ''}
+cat rosa/nolints.py
+```
+
+## Passing lints != Good code
+
+- [extensibility / maintainability]
+    - Untestable / unimportable
+    - Pulls data from a hard-coded filepath
+
+- [correctness]
+    - edge-case failures (see later)
+
+- [idioms]
+    - Use `with` when opening files
+    - Poor loops: `for ... in range(...)`, `i in my_dict.keys()`
+
+- [general]
+    - Poor docs / Poor names / Nested-conditionals / Long-function
+
+[Python Book of Antipatterns](
+  https://docs.quantifiedcode.com/python-anti-patterns/
+)
+
+## Passing lints != Importable code
+
+```{python, echo = FALSE}
+import os, sys
+
+sys.path.insert(0, os.getcwd())
+```
+
+```{python, echo = TRUE}
+try:
+    import rosa.nolints
+except FileNotFoundError as e:
+    print(e)
+```
+
+# Automate running your tests: `pytest`
+
+## Make it importable / testable
+
+We put a guard-block around the global env code
 
 ```{bash, echo = TRUE}
-diff rosa/initial.py rosa/cleaned.py | grep -e ">\|<" | head -n6
+cat rosa/testable.py | grep -A7 "__main__"
+```
+
+```{python, echo = TRUE}
+from rosa.testable import lgis # successful import
+```
+
+## Fix up with tests
+
+The function works fine, though, doesn't it ....
+
+```{python, echo = TRUE}
+print(
+  lgis([1, 3, 4,
+           2,
+                 5, 7,
+              4])
+)
+```
+
+## We can write tests to check the function
+
+```{python, echo = TRUE}
+# I've also put this code into tests/test_lgis.py
+
+from rosa.testable import lgis
+
+def test_it_isnt_greedy():
+    assert lgis([1, 4, 2, 3, 5]) != [1, 4, 5]
+
+def test_increasing_sequence():
+    assert lgis([1, 3, 4, 2, 5, 7, 4]) == [1, 3, 4, 5, 7]
+```
+
+```{python, echo = TRUE}
+test_it_isnt_greedy()
+test_increasing_sequence()
+
+# silent means they've passed
+```
+
+## `pytest` requires a python package structure
+
+- `__setup__.py` in the main directory with (at least) this code:
+
+```{bash, echo = TRUE}
+echo -e \
+"from setuptools import setup, find_packages
+setup(name='rosa', packages=find_packages())" \
+  > setup.py
+```
+
+- `__init__.py` in every dir containing your source code
+
+```{bash, echo = TRUE}
+echo "name = 'rosa'" > rosa/__init__.py
+```
+
+## Install the package and run the tests
+
+```{bash, echo = TRUE, results = FALSE}
+pip install -e .
 ```
 
 ```{bash, echo = TRUE}
-diff rosa/initial.py rosa/cleaned.py | grep -e ">\|<" | tail -n6
+pytest
 ```
+
+# Automate generating test cases: `hypothesis`
+
+## Randomly create your test data
+
+[hypothesis.readthedocs.io](https://hypothesis.readthedocs.io/en/latest/)
+
+```{python, echo = TRUE}
+from hypothesis import given, strategies as st
+```
+
+```{python, echo = TRUE}
+@given(my_ints=st.lists(st.integers(min_value=1), max_size=1))
+def test_trivial_sequences(my_ints):
+    assert my_ints == lgis(my_ints)
+```
+
+This generates
+
+- lots of separate integer-lists (`st.lists(st.integers, ....)`)
+
+- each list contains at-most one element (`... max_size=1`)
+
+- each integer is $\geq1$ (`st.integers(min_value=1)`)
+
+## But ...
+
+```{python, echo = TRUE}
+try:
+    test_trivial_sequences()
+except Exception as e:
+    print(e)
+```
+
+Randomised tests identified an edge-case failure for `lgis`: empty-list
+
+Any data that fails should be converted into a unit test
+
+## Try again with an updated function
+
+```{bash, comment = '', echo = TRUE}
+cat rosa/fixed_for_empty_list.py | grep -A6 "def lgis"
+```
+
+```{python, echo = TRUE}
+from rosa.fixed_for_empty_list import lgis
+
+test_trivial_sequences()
+```
+
+## Will this test pass for all input?
+
+```{python, echo = TRUE}
+@given(
+    my_ints=st.lists(
+        st.integers(min_value=1), min_size=2, max_size=5
+    )
+)
+def test_with_sorted_input(my_ints):
+    assert sorted(my_ints) == lgis(sorted(my_ints))
+```
+
+## ... No!
+
+```{python, echo = TRUE}
+try:
+    test_with_sorted_input()
+except Exception as e:
+    print(e)
+```
+
+This was a human error
+
+Moral: You still have to think about the tests and the test-data
+
+## Fix: ensure there are no repeated numbers in the input
+
+```{python, echo = TRUE}
+@given(
+    my_ints=st.lists(
+        st.integers(min_value=1), min_size=2, max_size=5,
+        unique=True
+    )
+)
+def test_with_sorted_unique_input(my_ints):
+    assert sorted(my_ints) == lgis(sorted(my_ints))
+```
+
+```{python, echo = TRUE}
+test_with_sorted_unique_input()
+```
+
+## Use-cases for randomised testing
+
+- Identify edge-case failures that you hadn't considered
+
+- Compare a _fancy_ algorithm to a brute-force solution (for small input)
+
+- Check the speed of an algorithm
+
+It forces you to think about the algebra of your problem
+
+For the example here:
+
+- the output should be increasing
+
+- the output should be a subsequence of the input
+
+- If we dovetail two sequences, the output should be no shorter than that for
+either sequence

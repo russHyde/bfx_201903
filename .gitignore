@@ -1,8 +1,21 @@
+# computed files
+# - note that some of these are computed while running the stuff in
+# `code_tools.Rmd` and wqouldn't normally be dropped from git
+
+*.html
+rosa/cleaned.py
+setup.py
+__init__.py
+rosa/__init__.py
+
+# R project stuff
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
+rsconnect
 
-# computed files
-*.html
-rosa/cleaned.py
+# Python stuff
+.hypothesis
+*egg-info
+**/__pycache__
