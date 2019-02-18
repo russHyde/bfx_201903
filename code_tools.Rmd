@@ -88,6 +88,58 @@ tribble(
 
 [Longest Increasing Subsequence](http://rosalind.info/problems/lgis/)
 
+- I _know_ that the code is bad. That's why I chose it.
+
+##
+
+```{r, echo = FALSE, message = FALSE}
+library(tidygraph)
+library(ggraph)
+
+set.seed(0)
+
+nodes <- data.frame(
+    name = 1:9,
+    value = sample(1:100, size = 9),
+    label = c("start", rep(NA, 7), "end"),
+    level = NA
+  )
+
+for (i in 1:9){
+  parents <- which(nodes[1:i, "value"] < nodes[i, "value"])
+  if (length(parents) == 0){
+    nodes[i, "level"] = 1
+  } else {
+    nodes[i, "level"] <- 1 + max(nodes[parents, "level"])
+  }
+}
+
+lgis_example <- tbl_graph(
+  nodes = nodes,
+  edges = data.frame(from = 1:8, to = 2:9)
+) %>%
+  mutate(x = name, y = value)
+```
+
+```{r, message = FALSE, warning = FALSE}
+lgis_example %>%
+  ggraph() +
+  geom_node_point(aes(colour = as.factor(level)), size = 4) +
+  geom_node_text(aes(label = label), nudge_y = -5) +
+  geom_node_text(aes(label = value), nudge_y = 5, nudge_x = 0.1) +
+  geom_edge_link2() +
+  theme_graph() +
+  scale_color_discrete(name = "Level") +
+  ggtitle(
+    "Illustration",
+    subtitle = "Made in `R` using `tidygraph` / `ggraph`"
+  )
+```
+
+- Partition entries into levels (based on values of preceding entries)
+
+- Identify parent(s) of each entry
+
 ##
 
 ```{bash, comment = ''}
@@ -236,19 +288,6 @@ cat rosa/testable.py | grep -A7 "__main__"
 from rosa.testable import lgis # successful import
 ```
 
-## Fix up with tests
-
-The function works fine, though, doesn't it ....
-
-```{python, echo = TRUE}
-print(
-  lgis([1, 3, 4,
-           2,
-                 5, 7,
-              4])
-)
-```
-
 ## We can write tests to check the function
 
 ```{python, echo = TRUE}
@@ -297,6 +336,27 @@ pip install -e .
 pytest
 ```
 
+## (Aside) Automate package-structure definition: `cookiecutter`
+
+- Many [`cookiecutter`](https://cookiecutter.readthedocs.io/en/latest/)
+  templates are available for python packages / programs
+
+~~~
+# eg, use this to setup `rosa_pkg`:
+cookiecutter git@github.com:kragniz/cookiecutter-pypackage-minimal.git
+
+tree rosa_pkg
+rosa_pkg/
+├── LICENSE
+├── README.rst
+├── rosa_pkg
+│   └── __init__.py
+├── setup.py
+├── tests
+│   └── test_sample.py
+└── tox.ini
+~~~
+
 # Automate generating test cases: `hypothesis`
 
 ## Randomly create your test data
@@ -343,7 +403,7 @@ cat rosa/fixed_for_empty_list.py | grep -A6 "def lgis"
 ```{python, echo = TRUE}
 from rosa.fixed_for_empty_list import lgis
 
-test_trivial_sequences()
+test_trivial_sequences() # runs without error
 ```
 
 ## Will this test pass for all input?
@@ -385,7 +445,7 @@ def test_with_sorted_unique_input(my_ints):
 ```
 
 ```{python, echo = TRUE}
-test_with_sorted_unique_input()
+test_with_sorted_unique_input() # the test now passes
 ```
 
 ## Use-cases for randomised testing
@@ -396,13 +456,42 @@ test_with_sorted_unique_input()
 
 - Check the speed of an algorithm
 
-It forces you to think about the algebra of your problem
+- Provides alternative, property-based, viewpoint, eg here:
+    - the output should be increasing
 
-For the example here:
+    - the output should be a subsequence of the input
 
-- the output should be increasing
+    - If we dovetail two sequences, the output should be no shorter than that
+    for either sequence
 
-- the output should be a subsequence of the input
+# Automate documentation generation: `sphinx`
 
-- If we dovetail two sequences, the output should be no shorter than that for
-either sequence
+## `sphinx`
+
+TODO
+
+<!--
+  TODO: sphinx workflow:
+      - generate a package
+      - `mkdir docs && cd docs`
+      - `sphinx-quickstart`
+      - `make html`
+      - `cd ..`
+      - modify code, add docs etc using sphinx or google formatted docstrings
+      - `sphinx-apidoc my_package -o docs`
+      - `cd docs && make html`
+-->
+
+# Doing the whole thing in `R` / Rstudio
+
+## Start a new package: `devtools`
+
+## Add some code
+
+## Add some tests: `testthat`
+
+## Style the code & tests
+
+## Lint the package
+
+## Add some documentation: `roxygen2`
