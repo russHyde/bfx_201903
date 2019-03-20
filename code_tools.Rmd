@@ -1,5 +1,5 @@
 ---
-title: "There's a tool to do that"
+title: "There's a tool for that"
 author: "Russ Hyde"
 date: "14 February 2019"
 output:
@@ -9,7 +9,18 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
+```
 
+```{r, message = FALSE}
+library(knitr)
+library(magrittr)
+library(tibble)
+library(stackr) # "dgrtwo/stackr"
+library(wordcloud)
+library(RColorBrewer)
+```
+```{r}
+set.seed(1)
 ```
 
 <!-- Formatting code
@@ -32,27 +43,71 @@ pre code, pre, code {
 }
 ```
 
-## R / Python development tools
+## This talk
 
-```{r}
-# library(kableExtra)
-library(knitr)
-library(magrittr)
-library(tibble)
+Assume some basic python (mainly; and a bit of R)
+    
+- No: _solving problems_ with code
+
+- Yes: easing _the problems of coding_
+
+Links
+
+- [http://rpubs.com/russH/467834]()
+
+- [https://github.com/russHyde/bfx_201903]()
+
+## My expertise wordcloud (according to Stack-Overflow) { .smaller }
+
+```{r, fig.height=3.2, warning=FALSE}
+with(
+  stackr::stack_users("1845650", "top-tags"),
+  wordcloud::wordcloud(
+    tag_name, answer_score, min.freq = 0, colors = RColorBrewer::brewer.pal(6, "Purples")[-1],
+    scale = c(10, 0.5)
+    ))
 ```
 
+... happy to answer `R` queries through `Yammer` / email
+
+- Made with `github::dgrtwo/stackr` and `wordcloud` packages
+
+## What tools / libraries help you ... { .smaller }
+
+... <span style="color:purple">package</span> stuff
+
+- [py] cookiecutter / setuptools; [R] devtools / usethis
+
+... <span style="color:purple">document</span> stuff
+
+- [py] sphinx / restructuredText; [R] roxygen2
+
+... <span style="color:purple">test</span> stuff
+
+- [py] pytest / hypothesis; [R] testthat / hedgehog
+
+... <span style="color:purple">style</span> stuff
+
+- [py] black / pylint; [R] styler / lintr
+
+... <span style="color:purple">interact</span> with the user
+
+- [py] click; [R] optparse
+
+<!--
 ```{r, echo  FALSE}
 tribble(
   ~ Job, ~ Python, ~ R,
   "IDE",  "PyCharm",  "Rstudio",
   "Styling", "black", "styler",
   "Linting", "pylint", "lintr",
-  "Testing", "pytest", "testthat",
-  "Packages", "cookiecutter / setuptools", "devtools / usethis",
+  "Testing", "pytest / hypothesis", "testthat / hedgehog",
+  "Packaging", "cookiecutter / setuptools", "devtools / usethis",
   "Docs", "sphinx / restructuredText", "roxygen2 / rmarkdown"
   ) %>%
   kable()
 ```
+-->
 
 <!-- Give more detail / alternatives in specific sections -->
 <!-- Other jobs:
@@ -86,11 +141,16 @@ tribble(
 
 [Rosalind](http://rosalind.info/about/)
 
+- Bioinformatics algorithmic challenges (akin to Project Euler / Codewars /
+Codesignal)
+
 [Longest Increasing Subsequence](http://rosalind.info/problems/lgis/)
 
-- I _know_ that the code is bad. That's why I chose it.
+- Pulled out my solution code (written ~ 6 years ago)
 
-##
+- I _know_ that my code is bad. That's why I chose it.
+
+## {.smaller}
 
 ```{r, echo = FALSE, message = FALSE}
 library(tidygraph)
@@ -131,91 +191,151 @@ lgis_example %>%
   theme_graph() +
   scale_color_discrete(name = "Level") +
   ggtitle(
-    "Illustration",
+    "`LGIS` Illustration",
     subtitle = "Made in `R` using `tidygraph` / `ggraph`"
   )
 ```
+
+- Input: unique positive integers
 
 - Partition entries into levels (based on values of preceding entries)
 
 - Identify parent(s) of each entry
 
-##
+## Initial Code
 
 ```{bash, comment = ''}
 cat rosa/initial.py
 ```
 
-# Automate reviewing code-quality / consistency: `pylint`
+# Automate packaging: `cookiecutter`
 
-## `pylint` messages
-
-<!--
-    [From realpython.com/python-code-quality]
-
-    Pylint prefixes each of the problem areas with a R, C, W, E, or F, meaning:
-
-    [R]efactor for a “good practice” metric violation
-    [C]onvention for coding standard violation
-    [W]arning for stylistic problems, or minor programming issues
-    [E]rror for important programming issues (i.e. most probably bug)
-    [F]atal for errors which prevented further processing
--->
+## Python packages look like this
 
 ```{bash, echo = TRUE}
-echo ...
+tree example_py_pkg
+```
+
+- Stuff works better when you structure it better
+
+## `cookiecutter`
+
+Templates that help structure a programming project
+
+- [`cookiecutter` docs](https://cookiecutter.readthedocs.io/en/latest/readme.html)
+
+Examples:
+
+- [Minimal python package template](
+    https://github.com/kragniz/cookiecutter-pypackage-minimal)
+
+- [`cookiecutter` author's python package template](
+    https://github.com/audreyr/cookiecutter-pypackage)
+    
+- [Data science template](
+    https://github.com/drivendata/cookiecutter-data-science)
+
+- [My snakemake / conda / .Rmd analysis-project template](
+    https://github.com/russHyde/data_buddy)
+    - work in progress
+
+## Define a minimal python package {.smaller}
+
+To use a `cookiecutter`:
+
+```
+cookiecutter git@github.com:<some_repo>.git
+```
+
+Then answer some config questions:
+
+```
+cookiecutter git@github.com:kragniz/cookiecutter-pypackage-minimal.git
+
+You've downloaded /home/ah327h/.cookiecutters/cookiecutter-pypackage-minimal before. Is it okay to delete and re-download it? [yes]: 
+author_name [Louis Taylor]: Russell Hyde
+author_email [louis@kragniz.eu]: me AT somewhere.uk
+package_name [cookiecutter_pypackage_minimal]: rosa_initial
+package_version [0.1.0]: 
+...
+```
+
+## Resulting directory:
+
+I copied in my `lgis.py` code into the resulting directory
+
+```{bash}
+tree rosa_initial
+```
+
+# Automate (trivial bits of) code-review: `pylint`
+
+## `pylint` {.smaller}
+
+[Link](https://www.pylint.org/)
+
+- finds non-idiomatic and inconsistently styled bits of code
+
+- highly configurable (alternative: `flake8`)
+
+```{bash, echo = TRUE}
 pylint --long-help | tail -n20 | head -n 8
 ```
 
-## `pylint` return codes
-
-```{bash, echo = TRUE}
-echo ...
-pylint --long-help | tail -n12
-```
-
-## Convention (C) and Warning (W) lints in the initial code
+## Booooring lints in the initial code {.smaller}
 
 <!--
     Have to use --exit-zero since non-zero bash blocks kill `Rmarkdown`
     compilation
 -->
 
-```{bash, echo = FALSE}
-echo "" > rosa/cleaned.py
-pylint rosa/cleaned.py --exit-zero > /dev/null
-```
-
-```{bash, eval = TRUE, echo = TRUE}
-cp rosa/{initial,cleaned}.py
-
-pylint rosa/cleaned.py --exit-zero
+```{bash, echo = TRUE}
+(cd rosa_initial/ && pylint rosa_initial --exit-zero)
 ```
 
 # Automate Styling : `black`
 
-## `black` modifies files in-place
+## `black` {.smaller}
+
+[Link](https://black.readthedocs.io/en/stable/)
+
+- formats files in-place
+
+- uncompromising and unconfigurable
+
+```{bash, echo = TRUE, eval = TRUE}
+# - Made another package `rosa_cleaned` (not shown)
+#
+# - Ensure the original code is present in the `rosa_cleaned` package
+# to begin with
+cp rosa_initial/rosa_initial/lgis.py \
+    rosa_cleaned/rosa_cleaned/lgis.py
+```
 
 ```{bash, echo = TRUE}
-black rosa/cleaned.py
+black rosa_cleaned/*/lgis.py
 ```
 
 ## Example `black` differences
 
 ```{bash, echo = TRUE}
-diff rosa/initial.py rosa/cleaned.py | grep -e ">\|<" | head -n6
+diff rosa_{initial,cleaned}/*/lgis.py | grep -e ">\|<" | head -n6
 ```
+
+- These are trivial differences
+
+- Value comes when applied to large projects
 
 ## The styled code
 
 ```{bash, comment = ''}
-cat rosa/cleaned.py
+cat rosa_cleaned/*/lgis.py
 ```
 
-## `black` reduced the lint count
+## After `black` the lints are non-trivial
 
 ```{bash, echo = TRUE}
-pylint rosa/cleaned.py --exit-zero
+(cd rosa_cleaned && pylint */lgis.py --exit-zero)
 ```
 
 ## Manually fixed the remaining lints:
@@ -239,20 +359,20 @@ Changes:
 cat rosa/nolints.py
 ```
 
-## Passing lints != Good code
+## Passing lints != Good code {.smaller}
 
-- [extensibility / maintainability]
+- <span style="color:purple">extensibility / maintainability</span>
     - Untestable / unimportable
     - Pulls data from a hard-coded filepath
 
-- [correctness]
+- <span style="color:purple">correctness</span>
     - edge-case failures (see later)
 
-- [idioms]
+- <span style="color:purple">idioms</span>
     - Use `with` when opening files
     - Poor loops: `for ... in range(...)`, `i in my_dict.keys()`
 
-- [general]
+- <span style="color:purple">general</span>
     - Poor docs / Poor names / Nested-conditionals / Long-function
 
 [Python Book of Antipatterns](
@@ -268,109 +388,79 @@ sys.path.insert(0, os.getcwd())
 ```
 
 ```{python, echo = TRUE}
+# The lint-free code is in ./rosa/nolints.py
 try:
     import rosa.nolints
 except FileNotFoundError as e:
     print(e)
 ```
 
+```{bash, echo = TRUE, eval = TRUE}
+# Hardcoded file in global-env at the offending line:
+grep "data_LGIS.txt" rosa/nolints.py
+```
+
 # Automate running your tests: `pytest`
 
-## Make it importable / testable
+## Make the file importable / testable
 
-We put a guard-block around the global env code
+Made another python package: `rosa_testable`
 
-```{bash, echo = TRUE}
-cat rosa/testable.py | grep -A7 "__main__"
+- `lgis.py` now contains a guard-block around the global-env code
+
+```{bash, echo = TRUE, comment=""}
+cat rosa_testable/*/lgis.py | grep -A7 "__main__"
 ```
 
-```{python, echo = TRUE}
-from rosa.testable import lgis # successful import
+## Make the function importable / testable {.smaller}
+
+Also, we ensured the function was exported by the `rosa_testable` package:
+
+```{bash, echo = TRUE, comment=""}
+cat rosa_testable/rosa_testable/__init__.py
 ```
 
-## We can write tests to check the function
+## Check importability {.smaller}
 
-```{python, echo = TRUE}
-# I've also put this code into tests/test_lgis.py
-
-from rosa.testable import lgis
-
-def test_it_isnt_greedy():
-    assert lgis([1, 4, 2, 3, 5]) != [1, 4, 5]
-
-def test_increasing_sequence():
-    assert lgis([1, 3, 4, 2, 5, 7, 4]) == [1, 3, 4, 5, 7]
+```{bash, echo = TRUE, comment="", message=FALSE}
+pip install -e rosa_testable # [bash]
 ```
 
-```{python, echo = TRUE}
-test_it_isnt_greedy()
-test_increasing_sequence()
-
-# silent means they've passed
+```{python, echo = TRUE, eval = TRUE}
+import rosa_testable as rt # [python] successful import
+print(rt.lgis([1,4,3,6,7,2,5]))
 ```
 
-## `pytest` requires a python package structure
+## Preliminary tests {.smaller}
 
-- `__setup__.py` in the main directory with (at least) this code:
-
-```{bash, echo = TRUE}
-echo -e \
-"from setuptools import setup, find_packages
-setup(name='rosa', packages=find_packages())" \
-  > setup.py
+```{bash, comment = "", echo = TRUE}
+cat rosa_testable/tests/test_lgis.py
 ```
 
-- `__init__.py` in every dir containing your source code
-
-```{bash, echo = TRUE}
-echo "name = 'rosa'" > rosa/__init__.py
+```{bash, echo = TRUE, eval = TRUE, comment=""}
+pytest rosa_testable --quiet # run all tests in rosa_testable/tests
 ```
 
-## Install the package and run the tests
+# Automate test-case generation: `hypothesis`
 
-```{bash, echo = TRUE, results = FALSE}
-pip install -e .
-```
+## `hypothesis` {.smaller}
 
-```{bash, echo = TRUE}
-pytest
-```
+[Link](https://hypothesis.readthedocs.io/en/latest/)
 
-## (Aside) Automate package-structure definition: `cookiecutter`
-
-- Many [`cookiecutter`](https://cookiecutter.readthedocs.io/en/latest/)
-  templates are available for python packages / programs
-
-~~~
-# eg, use this to setup `rosa_pkg`:
-cookiecutter git@github.com:kragniz/cookiecutter-pypackage-minimal.git
-
-tree rosa_pkg
-rosa_pkg/
-├── LICENSE
-├── README.rst
-├── rosa_pkg
-│   └── __init__.py
-├── setup.py
-├── tests
-│   └── test_sample.py
-└── tox.ini
-~~~
-
-# Automate generating test cases: `hypothesis`
-
-## Randomly create your test data
-
-[hypothesis.readthedocs.io](https://hypothesis.readthedocs.io/en/latest/)
+- Randomly create your test data
 
 ```{python, echo = TRUE}
 from hypothesis import given, strategies as st
 ```
 
 ```{python, echo = TRUE}
-@given(my_ints=st.lists(st.integers(min_value=1), max_size=1))
+@given(
+    my_ints=st.lists(
+        st.integers(min_value=1),
+        max_size=1)
+    )
 def test_trivial_sequences(my_ints):
-    assert my_ints == lgis(my_ints)
+    assert my_ints == rt.lgis(my_ints)
 ```
 
 This generates
@@ -394,28 +484,18 @@ Randomised tests identified an edge-case failure for `lgis`: empty-list
 
 Any data that fails should be converted into a unit test
 
-## Try again with an updated function
-
-```{bash, comment = '', echo = TRUE}
-cat rosa/fixed_for_empty_list.py | grep -A6 "def lgis"
-```
-
-```{python, echo = TRUE}
-from rosa.fixed_for_empty_list import lgis
-
-test_trivial_sequences() # runs without error
-```
-
 ## Will this test pass for all input?
 
 ```{python, echo = TRUE}
 @given(
     my_ints=st.lists(
-        st.integers(min_value=1), min_size=2, max_size=5
+        st.integers(min_value=1),
+        min_size=2,
+        max_size=5
     )
 )
 def test_with_sorted_input(my_ints):
-    assert sorted(my_ints) == lgis(sorted(my_ints))
+    assert sorted(my_ints) == rt.lgis(sorted(my_ints))
 ```
 
 ## ... No!
@@ -436,12 +516,14 @@ Moral: You still have to think about the tests and the test-data
 ```{python, echo = TRUE}
 @given(
     my_ints=st.lists(
-        st.integers(min_value=1), min_size=2, max_size=5,
+        st.integers(min_value=1),
+        min_size=2,
+        max_size=5,
         unique=True
     )
 )
 def test_with_sorted_unique_input(my_ints):
-    assert sorted(my_ints) == lgis(sorted(my_ints))
+    assert sorted(my_ints) == rt.lgis(sorted(my_ints))
 ```
 
 ```{python, echo = TRUE}
@@ -468,30 +550,109 @@ test_with_sorted_unique_input() # the test now passes
 
 ## `sphinx`
 
-TODO
+So there are automated tools for
 
-<!--
-  TODO: sphinx workflow:
-      - generate a package
-      - `mkdir docs && cd docs`
-      - `sphinx-quickstart`
-      - `make html`
-      - `cd ..`
-      - modify code, add docs etc using sphinx or google formatted docstrings
-      - `sphinx-apidoc my_package -o docs`
-      - `cd docs && make html`
--->
+- defining package structure
 
-# Doing the whole thing in `R` / Rstudio
+- cleaning up your code & identifying stylistic problems
 
-## Start a new package: `devtools`
+- running your (manually curated) tests
 
-## Add some code
+- finding additional tests
 
-## Add some tests: `testthat`
+Sphinx helps automate the generation of documentation
 
-## Style the code & tests
+## But ... {.smaller}
+
+The workflow for generating docs with sphinx looks like:
+
+```
+# - Setup a package structure
+# - Add some source code, with docstrings associated with the
+# modules / classes / functions
+
+# Initialise the docs file structure
+cd my_pkg
+mkdir docs && cd docs
+sphinx-quickstart # answer lots of questions
+
+sphinx-apidoc -o source ../my_pkg
+make html
+
+# Modify source/conf.py, swear a lot, question your sanity and try again
+```
+
+[sphinx-quickstart options](
+    https://pythonhosted.org/an_example_pypi_project/sphinx.html)
+
+[Sam Nicholls on sphinx setup](
+    https://samnicholls.net/2016/06/15/how-to-sphinx-readthedocs/)
+
+## Use a more full-featured python-package cookie-cutter
+
+```
+cookiecutter git@github.com:audreyr/cookiecutter-pypackage.git
+
+[Lots of questions - set up rosa_with_docs]
+
+[Write some source code]
+```
+
+```
+full_name [Audrey Roy Greenfeld]: Russell Hyde
+email [audreyr@example.com]: russ AT somewhere.net
+github_username [audreyr]: russHyde
+project_name [Python Boilerplate]: rosa_with_docs
+project_slug [rosa_with_docs]: 
+project_short_description [Python Boilerplate contains all the boilerplate you need to create a Python package.]: -
+pypi_username [russHyde]: -
+version [0.1.0]: 
+use_pytest [n]: y
+use_pypi_deployment_with_travis [y]: n
+add_pyup_badge [n]: n
+Select command_line_interface:
+1 - Click
+2 - No command-line interface
+Choose from 1, 2 (1, 2) [1]: 1
+create_author_file [y]: y
+Select open_source_license:
+1 - MIT license
+2 - BSD license
+3 - ISC license
+4 - Apache Software License 2.0
+5 - GNU General Public License v3
+6 - Not open source
+Choose from 1, 2, 3, 4, 5, 6 (1, 2, 3, 4, 5, 6) [1]: 1
+```
+
+## New project: {.smaller}
+
+```{bash, echo = TRUE, comment = ""}
+tree rosa_with_docs
+```
+
+## Install the new package
+
+```{bash, echo = TRUE}
+# use `make install` in normal use
+pip install -e rosa_with_docs
+```
+
+## Test the package
+
+```{bash, echo = TRUE}
+(cd rosa_with_docs && make test) # using pytest
+```
 
 ## Lint the package
 
-## Add some documentation: `roxygen2`
+```{bash, echo = TRUE, eval = FALSE}
+# Not ran
+(cd rosa_with_docs && make lint) # using flake8
+```
+
+## Make the docs
+
+```{bash, echo = TRUE}
+(cd rosa_with_docs && make docs)
+```
