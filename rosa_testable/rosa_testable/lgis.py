@@ -46,7 +46,7 @@ def lgis(perm):
 
 
 if __name__ == "__main__":
-    # Only runs when rosa/testable.py is called as a script ...
+    # This block only runs when this file is called as a script ...
     STREAM = open("data_LGIS.txt", "r").read().splitlines()
     MAXNUM = int(STREAM[0])
     PERM = [int(x) for x in STREAM[1].split()]
