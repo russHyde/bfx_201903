@@ -590,13 +590,14 @@ make html
 
 ## Use a more full-featured python-package cookie-cutter
 
+Set up `rosa_with_docs` project with the following:
+
 ```
 cookiecutter git@github.com:audreyr/cookiecutter-pypackage.git
-
-[Lots of questions - set up rosa_with_docs]
-
-[Write some source code]
 ```
+
+This cookiecutter comes with a Makefile covering linting, testing, installation
+and doc creation.
 
 ```
 full_name [Audrey Roy Greenfeld]: Russell Hyde
@@ -608,21 +609,7 @@ project_short_description [Python Boilerplate contains all the boilerplate you n
 pypi_username [russHyde]: -
 version [0.1.0]: 
 use_pytest [n]: y
-use_pypi_deployment_with_travis [y]: n
-add_pyup_badge [n]: n
-Select command_line_interface:
-1 - Click
-2 - No command-line interface
-Choose from 1, 2 (1, 2) [1]: 1
-create_author_file [y]: y
-Select open_source_license:
-1 - MIT license
-2 - BSD license
-3 - ISC license
-4 - Apache Software License 2.0
-5 - GNU General Public License v3
-6 - Not open source
-Choose from 1, 2, 3, 4, 5, 6 (1, 2, 3, 4, 5, 6) [1]: 1
+...
 ```
 
 ## New project: {.smaller}
@@ -653,6 +640,7 @@ pip install -e rosa_with_docs
 
 ## Make the docs
 
-```{bash, echo = TRUE}
+```{bash, echo = TRUE, eval = FALSE}
+# Not ran
 (cd rosa_with_docs && make docs)
 ```
