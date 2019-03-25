@@ -46,7 +46,7 @@ pre code, pre, code {
 ## This talk
 
 Assume some basic python (mainly; and a bit of R)
-    
+
 - No: _solving problems_ with code
 
 - Yes: easing _the problems of coding_
@@ -88,7 +88,7 @@ with(
 
 ... <span style="color:purple">style</span> stuff
 
-- [py] black / pylint; [R] styler / lintr
+- [py] black / pylint / flake8; [R] styler / lintr
 
 ... <span style="color:purple">interact</span> with the user
 
@@ -231,7 +231,7 @@ Examples:
 
 - [`cookiecutter` author's python package template](
     https://github.com/audreyr/cookiecutter-pypackage)
-    
+
 - [Data science template](
     https://github.com/drivendata/cookiecutter-data-science)
 
@@ -252,11 +252,11 @@ Then answer some config questions:
 ```
 cookiecutter git@github.com:kragniz/cookiecutter-pypackage-minimal.git
 
-You've downloaded /home/ah327h/.cookiecutters/cookiecutter-pypackage-minimal before. Is it okay to delete and re-download it? [yes]: 
+You've downloaded /home/ah327h/.cookiecutters/cookiecutter-pypackage-minimal before. Is it okay to delete and re-download it? [yes]:
 author_name [Louis Taylor]: Russell Hyde
 author_email [louis@kragniz.eu]: me AT somewhere.uk
 package_name [cookiecutter_pypackage_minimal]: rosa_initial
-package_version [0.1.0]: 
+package_version [0.1.0]:
 ...
 ```
 
@@ -546,23 +546,26 @@ test_with_sorted_unique_input() # the test now passes
     - If we dovetail two sequences, the output should be no shorter than that
     for either sequence
 
-# Automate documentation generation: `sphinx`
+# Automate documentation generation: `sphinx` / `click`
 
-## `sphinx`
+## Documentation
 
-So there are automated tools for
+- The tools above improve _your_ efficiency
 
-- defining package structure
+- Improve the effiency of the user and your collaborators (ie, _future you_)
 
-- cleaning up your code & identifying stylistic problems
+- Many levels:
 
-- running your (manually curated) tests
+    - Code comments & Exception / error handling
 
-- finding additional tests
+    - [`click` / `argparse`]
+        - `--help` / usage strings
 
-Sphinx helps automate the generation of documentation
+    - [`sphinx` / `ReadTheDocs`]
+        - API / program reference
+        - Tutorials / Cheatsheets / Cookbooks etc
 
-## But ... {.smaller}
+## Sphinx workflow {.smaller}
 
 The workflow for generating docs with sphinx looks like:
 
@@ -571,7 +574,7 @@ The workflow for generating docs with sphinx looks like:
 # - Add some source code, with docstrings associated with the
 # modules / classes / functions
 
-# Initialise the docs file structure
+# Initialise the `docs` file structure
 cd my_pkg
 mkdir docs && cd docs
 sphinx-quickstart # answer lots of questions
@@ -588,37 +591,34 @@ make html
 [Sam Nicholls on sphinx setup](
     https://samnicholls.net/2016/06/15/how-to-sphinx-readthedocs/)
 
-## Use a more full-featured python-package cookie-cutter
-
-Set up `rosa_with_docs` project with the following:
+## Try a full-featured python-package cookie-cutter
 
 ```
 cookiecutter git@github.com:audreyr/cookiecutter-pypackage.git
 ```
 
-This cookiecutter comes with a Makefile covering linting, testing, installation
-and doc creation.
+This has a Makefile for: linting, testing, installation and doc creation.
 
 ```
 full_name [Audrey Roy Greenfeld]: Russell Hyde
 email [audreyr@example.com]: russ AT somewhere.net
 github_username [audreyr]: russHyde
-project_name [Python Boilerplate]: rosa_with_docs
-project_slug [rosa_with_docs]: 
+project_name [Python Boilerplate]: detailed_py_package
+project_slug [detailed_py_package]:
 project_short_description [Python Boilerplate contains all the boilerplate you need to create a Python package.]: -
 pypi_username [russHyde]: -
-version [0.1.0]: 
+version [0.1.0]:
 use_pytest [n]: y
 ...
 ```
 
-## New project: {.smaller}
+## Detailed package structure {.smaller}
 
 ```{bash, echo = TRUE, comment = ""}
-tree rosa_with_docs
+tree detailed_py_package
 ```
 
-## Install the new package
+## Made a new sphinx-ready package
 
 ```{bash, echo = TRUE}
 # use `make install` in normal use
