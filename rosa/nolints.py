@@ -1,16 +1,33 @@
-"""
-Script to compute the `longest increasing subsequence`
+"""Script and functions to find the `longest increasing subsequence` in
+a sequence (as defined at rosalind.info/problems/lgis).
+
+Searches the working directory for a file called "data_LGIS.txt". The
+data file should contain two lines - the first containing the length of
+a sequence of integers and the second containing the sequence of
+integers.
+
+The integer sequence should consist of positive integers only
+(repetitions are allowed).
+
+Prints out both the longest increasing sequence, and the longest
+decreasing sequence to stdout.
 """
 
 STREAM = open("data_LGIS.txt", "r").read().splitlines()
-
 MAXNUM = int(STREAM[0])
 PERM = [int(x) for x in STREAM[1].split()]
 
 
 def lgis(perm):
-    """
-    Obtain the longest increasing subsequence from a list of integers
+    """Obtain the longest increasing subsequence from a list of
+    positive integers
+
+    Args:
+        perm (list(int)): A list of integers within which the longest
+        increasing subsequence is to be found.
+
+    Returns: A list of integers, a subsequence of the input list of
+        integers.
     """
     #
     levels = []

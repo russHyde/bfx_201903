@@ -34,7 +34,7 @@ set.seed(1)
 
 ```{css}
 pre code, pre, code {
-  max-height: 550px;
+  max-height: 480px;
   white-space: pre !important;
   overflow-x: scroll !important;
   overflow-y: scroll !important;
@@ -204,7 +204,7 @@ lgis_example %>%
 
 ## Initial Code
 
-```{bash, comment = ''}
+```{bash, echo = TRUE, comment = ''}
 cat rosa/initial.py
 ```
 
@@ -328,7 +328,7 @@ diff rosa_{initial,cleaned}/*/lgis.py | grep -e ">\|<" | head -n6
 
 ## The styled code
 
-```{bash, comment = ''}
+```{bash, comment = '', echo = TRUE}
 cat rosa_cleaned/*/lgis.py
 ```
 
@@ -353,9 +353,9 @@ Changes:
 - Changed empty-list tests:
     - `if len(my_list) > 0: ...` $\rightarrow$ `if my_list: ...`
 
-## Styled & Lint-free code:
+## Styled & Lint-free code: {.smaller}
 
-```{bash, comment = ''}
+```{bash, comment = '', echo = TRUE}
 cat rosa/nolints.py
 ```
 
@@ -374,6 +374,8 @@ cat rosa/nolints.py
 
 - <span style="color:purple">general</span>
     - Poor docs / Poor names / Nested-conditionals / Long-function
+
+- <span style="color:purple">comments?</span>
 
 [Python Book of Antipatterns](
   https://docs.quantifiedcode.com/python-anti-patterns/
@@ -565,24 +567,36 @@ test_with_sorted_unique_input() # the test now passes
         - API / program reference
         - Tutorials / Cheatsheets / Cookbooks etc
 
-## Sphinx workflow {.smaller}
+## Docstrings $\rightarrow$ Sphinx $\rightarrow$ Documentation
+
+Google-formatted docstrings used here.
+[Alternative formats.](https://www.datacamp.com/community/tutorials/docstrings-python)
+
+```{bash, echo = TRUE, comment = ""}
+grep -A10 "def lgis" rosa_testable/*/lgis.py
+```
+
+## Sphinx setup :0( {.smaller}
 
 The workflow for generating docs with sphinx looks like:
 
 ```
-# - Setup a package structure
-# - Add some source code, with docstrings associated with the
+# 1) - Setup a package structure
+# 2) - Add some source code, with docstrings associated with the
 # modules / classes / functions
 
-# Initialise the `docs` file structure
+# 3) Initialise the `docs` file structure
 cd my_pkg
 mkdir docs && cd docs
 sphinx-quickstart # answer lots of questions
-
 sphinx-apidoc -o source ../my_pkg
 make html
 
-# Modify source/conf.py, swear a lot, question your sanity and try again
+# 4) Modify source/conf.py, swear a lot, question your sanity and try
+# again
+
+# 5) Ask Russ "What happened to all the automated tools you were going
+# to talk about?"
 ```
 
 [sphinx-quickstart options](
@@ -597,7 +611,7 @@ make html
 cookiecutter git@github.com:audreyr/cookiecutter-pypackage.git
 ```
 
-This has a Makefile for: linting, testing, installation and doc creation.
+This has a Makefile for: linting, testing, installation and <span style="color:purple">documentation</span>.
 
 ```
 full_name [Audrey Roy Greenfeld]: Russell Hyde
@@ -618,29 +632,62 @@ use_pytest [n]: y
 tree detailed_py_package
 ```
 
-## Made a new sphinx-ready package
+## Made a `sphinx`-ready package
 
 ```{bash, echo = TRUE}
 # use `make install` in normal use
 pip install -e rosa_with_docs
 ```
 
-## Test the package
-
-```{bash, echo = TRUE}
-(cd rosa_with_docs && make test) # using pytest
-```
-
-## Lint the package
-
-```{bash, echo = TRUE, eval = FALSE}
-# Not ran
-(cd rosa_with_docs && make lint) # using flake8
-```
-
 ## Make the docs
 
 ```{bash, echo = TRUE, eval = FALSE}
-# Not ran
+# Not ran while building presentation
 (cd rosa_with_docs && make docs)
+```
+
+[Link to documentation](
+  ./rosa_with_docs/docs/_build/html/index.html
+)
+
+```
+rm -f docs/rosa_with_docs.rst
+rm -f docs/modules.rst
+sphinx-apidoc -o docs/ rosa_with_docs
+Creating file docs/rosa_with_docs.rst.
+Creating file docs/modules.rst.
+make -C docs clean
+make[1]: Entering directory '/home/ah327h/workshops/bfx_201903/rosa_with_docs/docs'
+Removing everything under '_build'...
+make[1]: Leaving directory '/home/ah327h/workshops/bfx_201903/rosa_with_docs/docs'
+make -C docs html
+make[1]: Entering directory '/home/ah327h/workshops/bfx_201903/rosa_with_docs/docs'
+Running Sphinx v1.8.4
+making output directory...
+building [mo]: targets for 0 po files that are out of date
+building [html]: targets for 9 source files that are out of date
+updating environment: 9 added, 0 changed, 0 removed
+reading sources... [100%] usage
+/home/ah327h/workshops/bfx_201903/rosa_with_docs/docs/index.rst:2: WARNING: Title underline too short.
+
+Welcome to rosa_with_docs's documentation!
+======================================
+looking for now-outdated files... none found
+pickling environment... done
+checking consistency... done
+preparing documents... done
+writing output... [100%] usage
+generating indices... genindex py-modindex
+highlighting module code... [100%] rosa_with_docs.lgis
+writing additional pages... search
+copying static files... WARNING: html_static_path entry '/home/ah327h/workshops/bfx_201903/rosa_with_docs/docs/_static' does not exist
+done
+copying extra files... done
+dumping search index in English (code: en) ... done
+dumping object inventory... done
+build succeeded, 2 warnings.
+
+The HTML pages are in _build/html.
+make[1]: Leaving directory '/home/ah327h/workshops/bfx_201903/rosa_with_docs/docs'
+python -c "$BROWSER_PYSCRIPT" docs/_build/html/index.html
 ```
