@@ -213,7 +213,7 @@ cat rosa/initial.py
 ## Python packages look like this
 
 ```{bash, echo = TRUE}
-tree example_py_pkg
+tree minimal_py_package
 ```
 
 - Stuff works better when you structure it better
