@@ -6,8 +6,6 @@
 rosa/cleaned.py
 rosa_cleaned/rosa_cleaned/lgis.py
 setup.py
-__init__.py
-rosa/__init__.py
 
 # R project stuff
 .Rproj.user
