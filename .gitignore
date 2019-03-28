@@ -5,7 +5,6 @@
 *.html
 rosa/cleaned.py
 rosa_cleaned/rosa_cleaned/lgis.py
-setup.py
 
 # R project stuff
 .Rproj.user
