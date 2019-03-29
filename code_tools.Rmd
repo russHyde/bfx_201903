@@ -15,10 +15,20 @@ knitr::opts_chunk$set(echo = FALSE)
 library(knitr)
 library(magrittr)
 library(tibble)
-library(stackr) # "dgrtwo/stackr"
 library(wordcloud)
 library(RColorBrewer)
+library(tidygraph)
+library(ggraph)
 ```
+
+```{r, message = FALSE}
+if (! "stackr" %in% installed.packages()){
+  Sys.setenv("TAR" = "tar") # workaround `gtar` bug on conda
+  devtools::install_github("dgrtwo/stackr", dependencies = FALSE)
+}
+library(stackr)
+```
+
 ```{r}
 set.seed(1)
 ```
@@ -139,8 +149,6 @@ Codesignal)
 ## {.smaller}
 
 ```{r, echo = FALSE, message = FALSE}
-library(tidygraph)
-library(ggraph)
 
 set.seed(0)
 
@@ -638,6 +646,7 @@ pip install -e rosa_with_docs
 )
 
 ```
+[example output]
 rm -f docs/rosa_with_docs.rst
 rm -f docs/modules.rst
 sphinx-apidoc -o docs/ rosa_with_docs
@@ -758,7 +767,7 @@ Added `lgis` as a subcommand of the `rosa_cli` CLI application
 ## Comparison to R tools
 
 ```{r, echo  FALSE}
-tribble(
+tibble::tribble(
   ~ Job, ~ Python, ~ R,
   "IDE",  "PyCharm",  "Rstudio",
   "Styling", "black", "styler",
@@ -768,5 +777,5 @@ tribble(
   "Docs", "sphinx / restructuredText", "roxygen2 / rmarkdown",
   "CLI", "click / argparse", "optparse"
   ) %>%
-  kable()
+  knitr::kable()
 ```
