@@ -1,7 +1,10 @@
 ---
 title: "There's a tool for that"
-author: "Russ Hyde"
-date: "14 February 2019"
+subtitle: "Presented @ Glasgow Uni Bioinformatics Meetup"
+author:
+    name: "Russ Hyde"
+    affiliation: "Paul O'Gorman Leukaemia Research Centre"
+date: "2019-03-29"
 output:
   ioslides_presentation:
     df_print: kable
