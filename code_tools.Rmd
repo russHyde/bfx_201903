@@ -202,7 +202,7 @@ lgis_example %>%
 cat rosa/initial.py
 ```
 
-# Automate packaging: `cookiecutter`
+# Automate packaging: _cookiecutter_
 
 ## Python packages look like this
 
@@ -262,7 +262,7 @@ I copied in my `lgis.py` code into the resulting directory
 tree rosa_initial
 ```
 
-# Automate (trivial bits of) code-review: `pylint`
+# Automate (trivial bits of) code-review: _pylint_
 
 ## `pylint` {.smaller}
 
@@ -287,7 +287,7 @@ pylint --long-help | tail -n20 | head -n 8
 (cd rosa_initial/ && pylint rosa_initial --exit-zero)
 ```
 
-# Automate Styling : `black`
+# Automate Styling : _black_
 
 ## `black` {.smaller}
 
@@ -396,7 +396,7 @@ except FileNotFoundError as e:
 grep "data_LGIS.txt" rosa/nolints.py
 ```
 
-# Automate running your tests: `pytest`
+# Automate running your tests: _pytest_
 
 ## Make the file importable / testable
 
@@ -437,7 +437,7 @@ cat rosa_testable/tests/test_lgis.py
 pytest rosa_testable --quiet # run all tests in rosa_testable/tests
 ```
 
-# Automate test-case generation: `hypothesis`
+# Automate test-case generation: _hypothesis_
 
 ## `hypothesis` {.smaller}
 
@@ -542,7 +542,7 @@ test_with_sorted_unique_input() # the test now passes
     - If we dovetail two sequences, the output should be no shorter than that
     for either sequence
 
-# Automate documentation generation: `sphinx` / `click`
+# Automate documentation generation: _sphinx_ / _click_
 
 ## Documentation
 
